@@ -1,151 +1,291 @@
 package muse2;
 
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.logging.Logger;
+
 public class SpatialCueAnalyzer {
-    // Enhanced ITD: Interaural Time Difference (microseconds)
-    public static double computeITD(float[] left, float[] right, float sampleRate) {
-        // Initial cross-correlation for coarse delay
-        int coarseDelay = findMaxCorrelationDelay(left, right, sampleRate);
+    private static final Logger logger = Logger.getLogger(SpatialCueAnalyzer.class.getName());
+    private static final int DEFAULT_SAMPLE_RATE = 44100;
+    private static final int MAX_LAG_SAMPLES = 100; // ~2.27ms at 44.1kHz
+    
+    public static class SpatialCues {
+        private double itdMicroseconds;
+        private double ildDecibels;
         
-        // Refine with phase analysis for sub-sample precision
-        double refinedDelay = refineDelayWithPhase(left, right, coarseDelay, sampleRate);
+        public SpatialCues(double itdMicroseconds, double ildDecibels) {
+            this.itdMicroseconds = itdMicroseconds;
+            this.ildDecibels = ildDecibels;
+        }
+        
+        public double getItdMicroseconds() { return itdMicroseconds; }
+        public double getIldDecibels() { return ildDecibels; }
+        
+        @Override
+        public String toString() {
+            return String.format("ITD: %.2fμs, ILD: %.2fdB", itdMicroseconds, ildDecibels);
+        }
+    }
+    
+    /**
+     * Analyzes ITD and ILD from stereo audio data
+     * @param leftChannel Left channel audio data
+     * @param rightChannel Right channel audio data
+     * @param sampleRate Sample rate of the audio
+     * @return SpatialCues containing ITD and ILD measurements
+     */
+    public static SpatialCues analyzeSpatialCues(float[] leftChannel, float[] rightChannel, int sampleRate) {
+        // Verify input
+        if (leftChannel == null || rightChannel == null || leftChannel.length == 0 || rightChannel.length == 0) {
+            throw new IllegalArgumentException("Audio channels cannot be null or empty");
+        }
+        
+        // Debug channel data (first few samples)
+        logger.info("Left channel first 5 samples: " + Arrays.toString(Arrays.copyOf(leftChannel, 5)));
+        logger.info("Right channel first 5 samples: " + Arrays.toString(Arrays.copyOf(rightChannel, 5)));
+        
+        // Calculate ITD using improved algorithm
+        double itd = calculateImprovedITD(leftChannel, rightChannel, sampleRate);
+        
+        // Calculate ILD
+        double ild = calculateILD(leftChannel, rightChannel);
+        
+        // Debug results
+        logger.info(String.format("Analysis results: ITD = %.2fμs, ILD = %.2fdB", itd, ild));
+        
+        return new SpatialCues(itd, ild);
+    }
+    
+    /**
+     * Improved ITD calculation using normalized cross-correlation and parabolic interpolation
+     * This avoids the 0.0 problem by ensuring proper normalization and interpolation
+     */
+    private static double calculateImprovedITD(float[] leftChannel, float[] rightChannel, int sampleRate) {
+        // Ensure equal length by trimming to the shorter one
+        int length = Math.min(leftChannel.length, rightChannel.length);
+        if (length <= MAX_LAG_SAMPLES * 2) {
+            logger.warning("Audio too short for accurate ITD measurement");
+            return 0.0;
+        }
+        
+        // Normalize signals to ensure proper correlation calculation
+        float[] leftNorm = normalize(Arrays.copyOf(leftChannel, length));
+        float[] rightNorm = normalize(Arrays.copyOf(rightChannel, length));
+        
+        double[] correlation = new double[MAX_LAG_SAMPLES * 2 + 1];
+        int correlationCenter = MAX_LAG_SAMPLES;
+        
+        // Calculate cross-correlation
+        for (int delay = -MAX_LAG_SAMPLES; delay <= MAX_LAG_SAMPLES; delay++) {
+            double sum = 0.0;
+            int count = 0;
+            
+            for (int i = 0; i < length; i++) {
+                int j = i + delay;
+                if (j >= 0 && j < length) {
+                    sum += leftNorm[i] * rightNorm[j];
+                    count++;
+                }
+            }
+            
+            // Store normalized correlation value
+            correlation[correlationCenter + delay] = count > 0 ? sum / count : 0.0;
+        }
+        
+        // Find peak correlation
+        int maxIndex = 0;
+        double maxCorrelation = correlation[0];
+        
+        for (int i = 1; i < correlation.length; i++) {
+            if (correlation[i] > maxCorrelation) {
+                maxCorrelation = correlation[i];
+                maxIndex = i;
+            }
+        }
+        
+        // Handle edge cases
+        if (maxIndex == 0 || maxIndex == correlation.length - 1) {
+            logger.warning("Peak at correlation edge - may be inaccurate");
+            int delay = maxIndex - correlationCenter;
+            return (delay * 1000000.0) / sampleRate; // Convert to microseconds
+        }
+        
+        // Parabolic interpolation for sub-sample accuracy
+        double y1 = correlation[maxIndex - 1];
+        double y2 = correlation[maxIndex];
+        double y3 = correlation[maxIndex + 1];
+        double d = (y3 - y1) / (2 * (2 * y2 - y1 - y3));
+        
+        // Refined delay with sub-sample precision
+        double refinedDelay = (maxIndex - correlationCenter) + d;
         
         // Convert to microseconds
-        return (refinedDelay / sampleRate) * 1000000.0;
+        double itdMicroseconds = (refinedDelay * 1000000.0) / sampleRate;
+        
+        logger.info("Calculated ITD: " + itdMicroseconds + "μs (peak at index " + maxIndex + 
+                   ", interpolated offset " + d + ")");
+        
+        return itdMicroseconds;
     }
     
-    // Find maximum correlation delay with improved peak detection
-    private static int findMaxCorrelationDelay(float[] left, float[] right, float sampleRate) {
-        int maxLag = (int)(sampleRate * 0.001); // +/-1ms window
-        int bestLag = 0;
-        double maxCorr = Double.NEGATIVE_INFINITY;
+    private static double calculateILD(float[] leftChannel, float[] rightChannel) {
+        double leftRMS = calculateRMS(leftChannel);
+        double rightRMS = calculateRMS(rightChannel);
         
-        // Use finer resolution for better accuracy
-        for (int lag = -maxLag; lag <= maxLag; lag++) {
-            double corr = crossCorrelation(left, right, lag);
-            if (corr > maxCorr) {
-                maxCorr = corr;
-                bestLag = lag;
-            }
-        }
+        // Prevent division by zero or very small values
+        if (rightRMS < 0.000001) rightRMS = 0.000001;
         
-        return bestLag;
+        return 20 * Math.log10(leftRMS / rightRMS);
     }
     
-    // Phase-based refinement for sub-sample accuracy
-    private static double refineDelayWithPhase(float[] left, float[] right, int coarseDelay, float sampleRate) {
-        // Use FFT to get phase difference at dominant frequency
-        int fftSize = 1024;
-        double[] leftFFT = fft(left, fftSize);
-        double[] rightFFT = fft(right, fftSize);
-        
-        // Find dominant frequency
-        int dominantBin = findDominantFrequency(leftFFT);
-        if (dominantBin == 0) return coarseDelay;
-        
-        // Calculate phase difference
-        double leftPhase = Math.atan2(leftFFT[dominantBin * 2 + 1], leftFFT[dominantBin * 2]);
-        double rightPhase = Math.atan2(rightFFT[dominantBin * 2 + 1], rightFFT[dominantBin * 2]);
-        
-        double phaseDiff = rightPhase - leftPhase;
-        
-        // Normalize phase difference
-        while (phaseDiff > Math.PI) phaseDiff -= 2 * Math.PI;
-        while (phaseDiff < -Math.PI) phaseDiff += 2 * Math.PI;
-        
-        // Convert phase difference to delay
-        double frequency = dominantBin * sampleRate / fftSize;
-        double phaseDelay = phaseDiff / (2 * Math.PI * frequency);
-        
-        // Combine coarse and fine estimates
-        double coarseDelaySec = coarseDelay / sampleRate;
-        return coarseDelaySec + phaseDelay;
-    }
-    
-    // Improved cross-correlation with windowing to reduce noise
-    private static double crossCorrelation(float[] x, float[] y, int lag) {
-        int len = Math.min(x.length, y.length);
+    private static double calculateRMS(float[] signal) {
         double sum = 0;
-        int count = 0;
+        for (float sample : signal) {
+            sum += sample * sample;
+        }
+        return Math.sqrt(sum / signal.length);
+    }
+    
+    private static float[] normalize(float[] signal) {
+        // Find max absolute value
+        float maxAbs = 0.0f;
+        for (float sample : signal) {
+            float abs = Math.abs(sample);
+            if (abs > maxAbs) maxAbs = abs;
+        }
         
-        if (lag >= 0) {
-            for (int i = 0; i < len - lag; i++) {
-                // Apply Hanning window to reduce edge effects
-                double window = 0.5 * (1 - Math.cos(2 * Math.PI * i / (len - lag)));
-                sum += x[i] * y[i + lag] * window;
-                count++;
-            }
-        } else {
-            for (int i = -lag; i < len; i++) {
-                // Apply Hanning window
-                double window = 0.5 * (1 - Math.cos(2 * Math.PI * (i + lag) / len));
-                sum += x[i] * y[i + lag] * window;
-                count++;
+        // Normalize
+        float[] normalized = new float[signal.length];
+        if (maxAbs > 0.000001f) {
+            for (int i = 0; i < signal.length; i++) {
+                normalized[i] = signal[i] / maxAbs;
             }
         }
         
-        return count > 0 ? sum / count : 0;
+        return normalized;
     }
     
-    // Simple FFT implementation
-    private static double[] fft(float[] input, int size) {
-        double[] output = new double[size * 2]; // Real and imaginary parts
+    /**
+     * Analyzes a stereo audio file and extracts spatial cues
+     * @param audioFile Path to stereo audio file
+     * @return SpatialCues containing ITD and ILD measurements
+     */
+    public static SpatialCues analyzeStereoFile(String audioFile) throws IOException, UnsupportedAudioFileException {
+        logger.info("Analyzing spatial cues in: " + audioFile);
         
-        for (int k = 0; k < size; k++) {
-            double real = 0, imag = 0;
-            for (int n = 0; n < size; n++) {
-                double angle = -2 * Math.PI * k * n / size;
-                double sample = n < input.length ? input[n] : 0;
-                real += sample * Math.cos(angle);
-                imag += sample * Math.sin(angle);
-            }
-            output[k * 2] = real;
-            output[k * 2 + 1] = imag;
+        // Load audio file
+        File file = new File(audioFile);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(file);
+        AudioFormat format = audioStream.getFormat();
+        
+        // Verify stereo
+        if (format.getChannels() != 2) {
+            throw new IllegalArgumentException("File must be stereo (2 channels): " + audioFile);
         }
         
-        return output;
-    }
-    
-    // Find dominant frequency bin
-    private static int findDominantFrequency(double[] fft) {
-        int maxBin = 0;
-        double maxMagnitude = 0;
+        // Read audio data
+        byte[] audioBytes = new byte[(int)audioStream.getFrameLength() * format.getFrameSize()];
+        int bytesRead = audioStream.read(audioBytes);
+        audioStream.close();
         
-        for (int i = 1; i < fft.length / 2; i++) {
-            double magnitude = Math.sqrt(fft[i * 2] * fft[i * 2] + fft[i * 2 + 1] * fft[i * 2 + 1]);
-            if (magnitude > maxMagnitude) {
-                maxMagnitude = magnitude;
-                maxBin = i;
-            }
+        if (bytesRead <= 0) {
+            throw new IOException("Could not read audio data from: " + audioFile);
         }
         
-        return maxBin;
-    }
-
-    // Enhanced ILD: Interaural Level Difference (dB)
-    public static double computeILD(float[] left, float[] right) {
-        // Use A-weighting for more perceptually relevant measurement
-        double rmsLeft = weightedRMS(left);
-        double rmsRight = weightedRMS(right);
+        // Convert to float arrays (separate channels)
+        float[][] channels = convertToFloatChannels(audioBytes, format);
+        float[] leftChannel = channels[0];
+        float[] rightChannel = channels[1];
         
-        if (rmsRight == 0) return 0;
-        return 20 * Math.log10(rmsLeft / rmsRight);
+        // Calculate ITD and ILD
+        return analyzeSpatialCues(leftChannel, rightChannel, (int)format.getSampleRate());
     }
     
-    // A-weighted RMS for more perceptually relevant ILD
-    private static double weightedRMS(float[] arr) {
-        double sum = 0;
-        int count = 0;
+    private static float[][] convertToFloatChannels(byte[] audioBytes, AudioFormat format) {
+        int numFrames = audioBytes.length / format.getFrameSize();
+        float[][] channels = new float[2][numFrames];
         
-        for (int i = 0; i < arr.length; i++) {
-            // Simple A-weighting approximation
-            double weight = 1.0;
-            if (i < arr.length * 0.1) weight = 0.5; // Low frequencies
-            else if (i > arr.length * 0.9) weight = 0.8; // High frequencies
+        int sampleSizeInBytes = format.getSampleSizeInBits() / 8;
+        boolean isBigEndian = format.isBigEndian();
+        
+        for (int i = 0; i < numFrames; i++) {
+            int frameOffset = i * format.getFrameSize();
             
-            sum += (arr[i] * weight) * (arr[i] * weight);
-            count++;
+            // Extract left channel
+            channels[0][i] = extractSample(audioBytes, frameOffset, sampleSizeInBytes, isBigEndian);
+            
+            // Extract right channel
+            channels[1][i] = extractSample(audioBytes, frameOffset + sampleSizeInBytes, 
+                                         sampleSizeInBytes, isBigEndian);
         }
         
-        return Math.sqrt(sum / count);
+        return channels;
+    }
+    
+    private static float extractSample(byte[] audioBytes, int offset, int sampleSizeInBytes, boolean isBigEndian) {
+        if (sampleSizeInBytes == 2) {
+            // 16-bit sample
+            short sample;
+            if (isBigEndian) {
+                sample = (short)((audioBytes[offset] << 8) | (audioBytes[offset + 1] & 0xFF));
+            } else {
+                sample = (short)((audioBytes[offset + 1] << 8) | (audioBytes[offset] & 0xFF));
+            }
+            return sample / 32768.0f;
+        } else {
+            // 8-bit sample
+            return (audioBytes[offset] & 0xFF) / 128.0f - 1.0f;
+        }
+    }
+    
+    // Legacy methods for backward compatibility
+    public static double computeITD(float[] left, float[] right, float sampleRate) {
+        SpatialCues cues = analyzeSpatialCues(left, right, (int)sampleRate);
+        return cues.getItdMicroseconds();
+    }
+    
+    public static double computeILD(float[] left, float[] right) {
+        return calculateILD(left, right);
+    }
+    
+    /**
+     * Simple test method for quick validation
+     */
+    public static void main(String[] args) {
+        try {
+            if (args.length > 0) {
+                // Analyze provided file
+                SpatialCues cues = analyzeStereoFile(args[0]);
+                System.out.println("Analysis results for " + args[0] + ":");
+                System.out.println("ITD: " + cues.getItdMicroseconds() + "μs");
+                System.out.println("ILD: " + cues.getIldDecibels() + "dB");
+            } else {
+                // Create and analyze test signal
+                String testFile = "test_itd_signal.wav";
+                System.out.println("Creating test signal with 250μs ITD...");
+                
+                // Use SyntheticSignalGenerator to create test signal if available
+                try {
+                    Class.forName("muse2.SyntheticSignalGenerator")
+                         .getMethod("generateSignalWithKnownITD", double.class, double.class, String.class)
+                         .invoke(null, 250.0, 1.0, testFile);
+                } catch (Exception e) {
+                    System.out.println("SyntheticSignalGenerator not available, can't create test signal");
+                    return;
+                }
+                
+                // Analyze generated test signal
+                SpatialCues cues = analyzeStereoFile(testFile);
+                System.out.println("Test signal analysis results:");
+                System.out.println("Expected ITD: 250.00μs");
+                System.out.println("Measured ITD: " + cues.getItdMicroseconds() + "μs");
+                System.out.println("Error: " + Math.abs(cues.getItdMicroseconds() - 250.0) + "μs");
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 } 

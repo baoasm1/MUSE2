@@ -1,0 +1,2 @@
+filename,shift_amount_hz,original_itd,original_ild,shifted_itd,shifted_ild,itd_change,ild_change
+test1,0.0,1.000,1.000,1.000,1.000,0.000,0.000

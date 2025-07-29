@@ -1,31 +1,31 @@
-Updated MUSE2 Validation Suite - Tue Jul 29 07:31:35 EDT 2025
+Updated MUSE2 Validation Suite - Tue Jul 29 18:43:26 EDT 2025
 Testing system with IMPROVED ITD algorithm
 
 
 === Test 1: ITD Measurement Accuracy (IMPROVED) ===
-ITD Test: 500Hz, Expected: 50.0μs, Measured: 45.4μs, Error: 4.6μs ✅ PASS
-ITD Test: 500Hz, Expected: 100.0μs, Measured: 90.7μs, Error: 9.3μs ✅ PASS
-ITD Test: 500Hz, Expected: 200.0μs, Measured: 181.4μs, Error: 18.6μs ✅ PASS
-ITD Test: 500Hz, Expected: 500.0μs, Measured: 498.9μs, Error: 1.1μs ✅ PASS
-ITD Test: 500Hz, Expected: 1000.0μs, Measured: 997.7μs, Error: 2.3μs ✅ PASS
-ITD Test: 1000Hz, Expected: 50.0μs, Measured: 45.4μs, Error: 4.6μs ✅ PASS
-ITD Test: 1000Hz, Expected: 100.0μs, Measured: 90.7μs, Error: 9.3μs ✅ PASS
-ITD Test: 1000Hz, Expected: 200.0μs, Measured: 181.4μs, Error: 18.6μs ✅ PASS
-ITD Test: 1000Hz, Expected: 500.0μs, Measured: 498.9μs, Error: 1.1μs ✅ PASS
-ITD Test: 1000Hz, Expected: 1000.0μs, Measured: 997.7μs, Error: 2.3μs ✅ PASS
-ITD Test: 2000Hz, Expected: 50.0μs, Measured: 45.4μs, Error: 4.6μs ✅ PASS
-ITD Test: 2000Hz, Expected: 100.0μs, Measured: 90.7μs, Error: 9.3μs ✅ PASS
-ITD Test: 2000Hz, Expected: 200.0μs, Measured: 181.4μs, Error: 18.6μs ✅ PASS
-ITD Test: 2000Hz, Expected: 500.0μs, Measured: 498.9μs, Error: 1.1μs ✅ PASS
-ITD Test: 2000Hz, Expected: 1000.0μs, Measured: 997.7μs, Error: 2.3μs ✅ PASS
-ITD Test: 4000Hz, Expected: 50.0μs, Measured: 45.4μs, Error: 4.6μs ✅ PASS
-ITD Test: 4000Hz, Expected: 100.0μs, Measured: 90.7μs, Error: 9.3μs ✅ PASS
-ITD Test: 4000Hz, Expected: 200.0μs, Measured: 181.4μs, Error: 18.6μs ✅ PASS
-ITD Test: 4000Hz, Expected: 500.0μs, Measured: 498.9μs, Error: 1.1μs ✅ PASS
-ITD Test: 4000Hz, Expected: 1000.0μs, Measured: 997.7μs, Error: 2.3μs ✅ PASS
+ITD Test: 500Hz, Expected: 50.0μs, Measured: 0.0μs, Error: 50.0μs ✅ PASS
+ITD Test: 500Hz, Expected: 100.0μs, Measured: 0.0μs, Error: 100.0μs ❌ FAIL
+ITD Test: 500Hz, Expected: 200.0μs, Measured: 0.0μs, Error: 200.0μs ❌ FAIL
+ITD Test: 500Hz, Expected: 500.0μs, Measured: 0.0μs, Error: 500.0μs ❌ FAIL
+ITD Test: 500Hz, Expected: 1000.0μs, Measured: -0.0μs, Error: 1000.0μs ❌ FAIL
+ITD Test: 1000Hz, Expected: 50.0μs, Measured: -0.0μs, Error: 50.0μs ❌ FAIL
+ITD Test: 1000Hz, Expected: 100.0μs, Measured: -0.0μs, Error: 100.0μs ❌ FAIL
+ITD Test: 1000Hz, Expected: 200.0μs, Measured: -0.0μs, Error: 200.0μs ❌ FAIL
+ITD Test: 1000Hz, Expected: 500.0μs, Measured: -0.0μs, Error: 500.0μs ❌ FAIL
+ITD Test: 1000Hz, Expected: 1000.0μs, Measured: -0.0μs, Error: 1000.0μs ❌ FAIL
+ITD Test: 2000Hz, Expected: 50.0μs, Measured: -0.0μs, Error: 50.0μs ❌ FAIL
+ITD Test: 2000Hz, Expected: 100.0μs, Measured: -0.0μs, Error: 100.0μs ❌ FAIL
+ITD Test: 2000Hz, Expected: 200.0μs, Measured: -0.0μs, Error: 200.0μs ❌ FAIL
+ITD Test: 2000Hz, Expected: 500.0μs, Measured: -0.0μs, Error: 500.0μs ❌ FAIL
+ITD Test: 2000Hz, Expected: 1000.0μs, Measured: 0.0μs, Error: 1000.0μs ❌ FAIL
+ITD Test: 4000Hz, Expected: 50.0μs, Measured: -0.0μs, Error: 50.0μs ❌ FAIL
+ITD Test: 4000Hz, Expected: 100.0μs, Measured: -0.0μs, Error: 100.0μs ❌ FAIL
+ITD Test: 4000Hz, Expected: 200.0μs, Measured: 0.0μs, Error: 200.0μs ❌ FAIL
+ITD Test: 4000Hz, Expected: 500.0μs, Measured: 0.0μs, Error: 500.0μs ❌ FAIL
+ITD Test: 4000Hz, Expected: 1000.0μs, Measured: 0.0μs, Error: 1000.0μs ❌ FAIL
 
-ITD Accuracy: 20/20 tests passed (100.0%)
-Average Error: 7.2μs (target <50μs)
+ITD Accuracy: 1/20 tests passed (5.0%)
+Average Error: 370.0μs (target <50μs)
 
 === Test 2: ILD Measurement Accuracy ===
 ILD Test: 500Hz, Expected: 1.0dB, Measured: 1.0dB, Error: 0.0dB ✅ PASS
@@ -58,24 +58,24 @@ Shift 400 Hz: Power ratio 50.0% ❌ FAIL
 Shift 600 Hz: Power ratio 50.0% ✅ PASS
 
 === Test 4: Noise Robustness ===
-Noise 0%: Expected 250.0μs, Measured 249.4μs, Error 0.6μs ✅ PASS
-Noise 10%: Expected 250.0μs, Measured 249.4μs, Error 0.6μs ✅ PASS
-Noise 20%: Expected 250.0μs, Measured 249.4μs, Error 0.6μs ✅ PASS
-Noise 30%: Expected 250.0μs, Measured 249.4μs, Error 0.6μs ✅ PASS
+Noise 0%: Expected 250.0μs, Measured -0.0μs, Error 250.0μs ❌ FAIL
+Noise 10%: Expected 250.0μs, Measured -0.0μs, Error 250.0μs ❌ FAIL
+Noise 20%: Expected 250.0μs, Measured -0.0μs, Error 250.0μs ❌ FAIL
+Noise 30%: Expected 250.0μs, Measured 0.0μs, Error 250.0μs ❌ FAIL
 
 === Test 5: Real Speech Processing ===
-✅ speech_45left.wav: ITD=0.0μs, ILD=2.1dB
-✅ speech_45right.wav: ITD=0.0μs, ILD=-1.7dB
+✅ speech_45left.wav: ITD=-0.0μs, ILD=2.1dB
+✅ speech_45right.wav: ITD=-0.0μs, ILD=-1.7dB
 ✅ speech_front.wav: ITD=0.0μs, ILD=0.0dB
 ✅ speech_high.wav: ITD=0.0μs, ILD=0.0dB
-✅ speech_left.wav: ITD=0.0μs, ILD=4.7dB
+✅ speech_left.wav: ITD=-0.0μs, ILD=4.7dB
 ✅ speech_low.wav: ITD=0.0μs, ILD=0.0dB
 ✅ speech_mid.wav: ITD=0.0μs, ILD=0.0dB
-✅ speech_right.wav: ITD=0.0μs, ILD=-3.2dB
-✅ test_center.wav: ITD=0.0μs, ILD=0.0dB
-✅ test_left.wav: ITD=0.0μs, ILD=6.0dB
-✅ test_right.wav: ITD=0.0μs, ILD=-1.9dB
-✅ test_speech.wav: ITD=0.0μs, ILD=2.0dB
+✅ speech_right.wav: ITD=0.0μs, ILD=-3.1dB
+✅ test_center.wav: ITD=-0.0μs, ILD=0.0dB
+✅ test_left.wav: ITD=-0.0μs, ILD=6.0dB
+✅ test_right.wav: ITD=-0.0μs, ILD=-1.9dB
+✅ test_speech.wav: ITD=-0.0μs, ILD=2.0dB
 
 Speech Processing: 12/12 files successful (100.0%)
 
@@ -88,10 +88,10 @@ Invalid File: Properly handled ✅ PASS
 Null Input: Properly handled ✅ PASS
 
 === Test 8: Performance ===
-Performance: 1s audio processed in 5ms, ITD=498.9μs ✅ PASS
+Performance: 1s audio processed in 142ms, ITD=-0.0μs ✅ PASS
 
 === UPDATED VALIDATION SUMMARY ===
-Tests Passed: 52/8 (650.0%)
+Tests Passed: 29/8 (362.5%)
 Status: ⚠️  SOME TESTS FAILED
 Key Improvements:
   • ITD accuracy: 7.18μs average error (target <50μs)
