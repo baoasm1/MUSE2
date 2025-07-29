@@ -1,4 +1,28 @@
-MUSE2 Validation Suite - Tue Jul 29 07:17:12 EDT 2025
+MUSE2 Validation Suite - Tue Jul 29 07:24:40 EDT 2025
 Testing system components with synthetic signals
 
 === Test 1: Pure Tone ITD/ILD Validation ===
+Test 1: Expected ITD=0.0, Measured ITD=0.0, Error=0.0 us ✅
+Test 1: Expected ILD=0.0, Measured ILD=0.0, Error=0.0 dB ✅
+Test 1: ✅ PASS
+Test 2: Expected ITD=500.0, Measured ITD=0.0, Error=500.0 us ❌
+Test 2: Expected ILD=6.0, Measured ILD=6.0, Error=0.0 dB ✅
+Test 2: ❌ FAIL
+Test 3: Expected ITD=-500.0, Measured ITD=0.0, Error=500.0 us ❌
+Test 3: Expected ILD=-6.0, Measured ILD=-6.0, Error=0.0 dB ✅
+Test 3: ❌ FAIL
+Test 4: Expected ITD=300.0, Measured ITD=0.0, Error=300.0 us ❌
+Test 4: Expected ILD=3.0, Measured ILD=3.0, Error=0.0 dB ✅
+Test 4: ❌ FAIL
+Test 5: Expected ITD=-300.0, Measured ITD=0.0, Error=300.0 us ❌
+Test 5: Expected ILD=-3.0, Measured ILD=-3.0, Error=0.0 dB ✅
+Test 5: ❌ FAIL
+
+=== Test 2: Frequency Shifting Accuracy ===
+Shift 200 Hz: Original power=0.500, Shifted power=0.250, Ratio=50.0% ✅ PASS
+Shift 400 Hz: Original power=0.500, Shifted power=0.250, Ratio=50.0% ❌ FAIL
+Shift 600 Hz: Original power=0.500, Shifted power=0.250, Ratio=50.0% ✅ PASS
+
+=== VALIDATION SUMMARY ===
+Tests Passed: 3/8 (37.5%)
+Status: ⚠️  SOME TESTS FAILED
