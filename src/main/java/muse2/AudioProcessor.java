@@ -10,10 +10,6 @@ public class AudioProcessor {
     private float sampleRate;
 
     public AudioProcessor(String filename) throws Exception {
-        loadWavFile(filename);
-    }
-
-    private void loadWavFile(String filename) throws Exception {
         float[][] audio = loadWavFile(filename);
         this.leftChannel = audio[0];
         this.rightChannel = audio[1];
@@ -53,11 +49,6 @@ public class AudioProcessor {
         }
         
         return new float[][] { leftChannel, rightChannel };
-    }
-    
-    // Public static method for loading WAV files
-    public static float[][] loadWavFile(String filename) throws Exception {
-        return loadWavFileStatic(filename);
     }
 
     public float[] getLeftChannel() {
