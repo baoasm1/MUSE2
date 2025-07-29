@@ -14,6 +14,14 @@ public class AudioProcessor {
     }
 
     private void loadWavFile(String filename) throws Exception {
+        float[][] audio = loadWavFile(filename);
+        this.leftChannel = audio[0];
+        this.rightChannel = audio[1];
+        this.sampleRate = 44100.0f;
+    }
+    
+    // Public static method for loading WAV files
+    public static float[][] loadWavFile(String filename) throws Exception {
         File file = new File(filename);
         AudioInputStream ais = AudioSystem.getAudioInputStream(file);
         AudioFormat format = ais.getFormat();
@@ -28,14 +36,12 @@ public class AudioProcessor {
             throw new Exception("Audio file must be PCM signed.");
         }
 
-        this.sampleRate = format.getSampleRate();
-
         byte[] audioBytes = ais.readAllBytes();
         int frameSize = format.getFrameSize();
         int numFrames = audioBytes.length / frameSize;
 
-        leftChannel = new float[numFrames];
-        rightChannel = new float[numFrames];
+        float[] leftChannel = new float[numFrames];
+        float[] rightChannel = new float[numFrames];
 
         for (int i = 0; i < numFrames; i++) {
             int sampleIndex = i * frameSize;
@@ -45,6 +51,13 @@ public class AudioProcessor {
             leftChannel[i] = left / 32768.0f;
             rightChannel[i] = right / 32768.0f;
         }
+        
+        return new float[][] { leftChannel, rightChannel };
+    }
+    
+    // Public static method for loading WAV files
+    public static float[][] loadWavFile(String filename) throws Exception {
+        return loadWavFileStatic(filename);
     }
 
     public float[] getLeftChannel() {
