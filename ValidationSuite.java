@@ -10,7 +10,7 @@ public class ValidationSuite {
             demoMode = true;
         }
         
-        System.out.println("🔬 MUSE2 Validation Suite" + (demoMode ? " - DEMO MODE" : ""));
+        System.out.println("MUSE2 Validation Suite" + (demoMode ? " - DEMO MODE" : ""));
         System.out.println("Testing system with synthetic signals" + (demoMode ? " for presentation..." : "..."));
         
         try (PrintWriter log = new PrintWriter(new FileWriter(LOG_FILE))) {
@@ -72,28 +72,28 @@ public class ValidationSuite {
                 "  • System integration: %d/%d components working\n" +
                 "\nResearch Readiness: %s",
                 passedTests, totalTests, (passedTests*100.0/totalTests),
-                (passedTests == totalTests) ? "✅ ALL TESTS PASSED" : "⚠️  SOME TESTS FAILED",
+                (passedTests == totalTests) ? "ALL TESTS PASSED" : "SOME TESTS FAILED",
                 getAverageITDAccuracy(), getAverageILDAccuracy(), getFrequencyShiftingQuality(),
                 getSystemIntegrationScore(), 5,
-                (passedTests >= 6) ? "✅ READY FOR PRESENTATION" : "⚠️  NEEDS REFINEMENT");
+                (passedTests >= 6) ? "READY FOR PRESENTATION" : "NEEDS REFINEMENT");
             
             log.println(summary);
             System.out.println(summary);
             
             if (demoMode) {
-                System.out.println("\n📊 Results saved to: " + LOG_FILE);
-                System.out.println("🎉 System ready for research presentation!");
+                System.out.println("\nResults saved to: " + LOG_FILE);
+                System.out.println("System ready for research presentation!");
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Validation failed: " + e.getMessage());
+            System.err.println("Validation failed: " + e.getMessage());
             e.printStackTrace();
         }
     }
     
     private static int[] testPureToneValidation(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🎵 Test 1: Pure Tone ITD/ILD Validation");
+            System.out.println("\nTest 1: Pure Tone ITD/ILD Validation");
         }
         log.println("\n=== Test 1: Pure Tone ITD/ILD Validation ===");
         
@@ -125,24 +125,24 @@ public class ValidationSuite {
                 
                 if (testPass) passed++;
                 
-                String status = testPass ? "✅ PASS" : "❌ FAIL";
+                String status = testPass ? "PASS" : "FAIL";
                 
                 log.printf("Test %d: Expected ITD=%.1f, Measured ITD=%.1f, Error=%.1f us %s\n", 
-                    i+1, expectedITDs[i], measuredITD, itdError, itdPass ? "✅" : "❌");
+                    i+1, expectedITDs[i], measuredITD, itdError, itdPass ? "PASS" : "FAIL");
                 log.printf("Test %d: Expected ILD=%.1f, Measured ILD=%.1f, Error=%.1f dB %s\n", 
-                    i+1, expectedILDs[i], measuredILD, ildError, ildPass ? "✅" : "❌");
+                    i+1, expectedILDs[i], measuredILD, ildError, ildPass ? "PASS" : "FAIL");
                 log.printf("Test %d: %s\n", i+1, status);
                 
                 if (demoMode) {
-                    System.out.printf("  Test %d: ITD %.1f→%.1f μs (%.1f), ILD %.1f→%.1f dB (%.1f) %s\n",
+                    System.out.printf("  Test %d: ITD %.1f->%.1f μs (%.1f), ILD %.1f->%.1f dB (%.1f) %s\n",
                         i+1, expectedITDs[i], measuredITD, itdError, 
                         expectedILDs[i], measuredILD, ildError, status);
                 }
                 
             } catch (Exception e) {
-                log.printf("❌ Test %d failed: %s\n", i+1, e.getMessage());
+                log.printf("Test %d failed: %s\n", i+1, e.getMessage());
                 if (demoMode) {
-                    System.out.printf("  Test %d: ❌ ERROR - %s\n", i+1, e.getMessage());
+                    System.out.printf("  Test %d: ERROR - %s\n", i+1, e.getMessage());
                 }
             }
         }
@@ -156,7 +156,7 @@ public class ValidationSuite {
     
     private static int[] testFrequencyShiftingAccuracy(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🎵 Test 2: Frequency Shifting Quality");
+            System.out.println("\nTest 2: Frequency Shifting Quality");
         }
         log.println("\n=== Test 2: Frequency Shifting Accuracy ===");
         
@@ -187,7 +187,7 @@ public class ValidationSuite {
                 
                 if (testPass) passed++;
                 
-                String status = testPass ? "✅ PASS" : "❌ FAIL";
+                String status = testPass ? "PASS" : "FAIL";
                 
                 log.printf("Shift %.0f Hz: Original power=%.3f, Shifted power=%.3f, Ratio=%.1f%% %s\n", 
                     shift, originalPower, shiftedPower, powerRatio*100, status);
@@ -198,9 +198,9 @@ public class ValidationSuite {
                 }
                 
             } catch (Exception e) {
-                log.printf("❌ Frequency shift test failed: %s\n", e.getMessage());
+                log.printf("Frequency shift test failed: %s\n", e.getMessage());
                 if (demoMode) {
-                    System.out.printf("  Shift %.0f Hz: ❌ ERROR\n", shift);
+                    System.out.printf("  Shift %.0f Hz: ERROR\n", shift);
                 }
             }
         }
@@ -214,7 +214,7 @@ public class ValidationSuite {
     
     private static int[] testSpeechLikeSignals(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🗣️ Test 3: Speech-like Signal Processing");
+            System.out.println("\nTest 3: Speech-like Signal Processing");
         }
         log.println("\n=== Test 3: Speech-like Signal Processing ===");
         
@@ -243,10 +243,10 @@ public class ValidationSuite {
                     if (testPass) passed++;
                     
                     log.printf("Speech-like: ITD=%.1fμs (%.1f), ILD=%.1fdB (%.1f) %s\n",
-                        itd, itdError, ild, ildError, testPass ? "✅" : "❌");
+                        itd, itdError, ild, ildError, testPass ? "PASS" : "FAIL");
                     
                 } catch (Exception e) {
-                    log.printf("❌ Speech-like test failed: %s\n", e.getMessage());
+                    log.printf("Speech-like test failed: %s\n", e.getMessage());
                 }
             }
         }
@@ -260,7 +260,7 @@ public class ValidationSuite {
     
     private static int[] testNoiseRobustness(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🔊 Test 4: Noise Robustness");
+            System.out.println("\nTest 4: Noise Robustness");
         }
         log.println("\n=== Test 4: Noise Robustness ===");
         
@@ -290,15 +290,15 @@ public class ValidationSuite {
                 if (testPass) passed++;
                 
                 log.printf("Noise %.0f%%: ITD error=%.1fμs, ILD error=%.1fdB %s\n",
-                    noise*100, itdError, ildError, testPass ? "✅" : "❌");
+                    noise*100, itdError, ildError, testPass ? "PASS" : "FAIL");
                 
                 if (demoMode) {
                     System.out.printf("  %.0f%% noise: ITD %.1fμs, ILD %.1fdB %s\n",
-                        noise*100, itdError, ildError, testPass ? "✅" : "❌");
+                        noise*100, itdError, ildError, testPass ? "PASS" : "FAIL");
                 }
                 
             } catch (Exception e) {
-                log.printf("❌ Noise test failed: %s\n", e.getMessage());
+                log.printf("Noise test failed: %s\n", e.getMessage());
             }
         }
         
@@ -311,7 +311,7 @@ public class ValidationSuite {
     
     private static int[] testSystemIntegration(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🔗 Test 5: System Integration");
+            System.out.println("\nTest 5: System Integration");
         }
         log.println("\n=== Test 5: System Integration ===");
         
@@ -324,9 +324,9 @@ public class ValidationSuite {
             float[][] testSignal = muse2.SyntheticSignalGenerator.generateSineStereo(1.0, 44100, 1000, 0, 0);
             // This would test audio loading if we had WAV writing capability
             passed++;
-            log.println("Audio loading: ✅ PASS");
+            log.println("Audio loading: PASS");
         } catch (Exception e) {
-            log.println("Audio loading: ❌ FAIL - " + e.getMessage());
+            log.println("Audio loading: FAIL - " + e.getMessage());
         }
         
         // Test 2: Spatial cue measurement
@@ -337,12 +337,12 @@ public class ValidationSuite {
             
             if (!Double.isNaN(itd) && !Double.isNaN(ild)) {
                 passed++;
-                log.println("Spatial cue measurement: ✅ PASS");
+                log.println("Spatial cue measurement: PASS");
             } else {
-                log.println("Spatial cue measurement: ❌ FAIL");
+                log.println("Spatial cue measurement: FAIL");
             }
         } catch (Exception e) {
-            log.println("Spatial cue measurement: ❌ FAIL - " + e.getMessage());
+            log.println("Spatial cue measurement: FAIL - " + e.getMessage());
         }
         
         // Test 3: Frequency shifting
@@ -352,12 +352,12 @@ public class ValidationSuite {
             
             if (shifted != null && shifted.length == 2) {
                 passed++;
-                log.println("Frequency shifting: ✅ PASS");
+                log.println("Frequency shifting: PASS");
             } else {
-                log.println("Frequency shifting: ❌ FAIL");
+                log.println("Frequency shifting: FAIL");
             }
         } catch (Exception e) {
-            log.println("Frequency shifting: ❌ FAIL - " + e.getMessage());
+            log.println("Frequency shifting: FAIL - " + e.getMessage());
         }
         
         if (demoMode) {
@@ -369,7 +369,7 @@ public class ValidationSuite {
     
     private static int[] testEdgeCases(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🛡️ Test 6: Edge Case Handling");
+            System.out.println("\nTest 6: Edge Case Handling");
         }
         log.println("\n=== Test 6: Edge Case Handling ===");
         
@@ -384,12 +384,12 @@ public class ValidationSuite {
             
             if (itd == 0.0 && ild == 0.0) {
                 passed++;
-                log.println("Zero-length signals: ✅ PASS");
+                log.println("Zero-length signals: PASS");
             } else {
-                log.println("Zero-length signals: ❌ FAIL");
+                log.println("Zero-length signals: FAIL");
             }
         } catch (Exception e) {
-            log.println("Zero-length signals: ❌ FAIL - " + e.getMessage());
+            log.println("Zero-length signals: FAIL - " + e.getMessage());
         }
         
         // Test 2: Very short signals
@@ -399,12 +399,12 @@ public class ValidationSuite {
             
             if (!Double.isNaN(itd)) {
                 passed++;
-                log.println("Short signals: ✅ PASS");
+                log.println("Short signals: PASS");
             } else {
-                log.println("Short signals: ❌ FAIL");
+                log.println("Short signals: FAIL");
             }
         } catch (Exception e) {
-            log.println("Short signals: ❌ FAIL - " + e.getMessage());
+            log.println("Short signals: FAIL - " + e.getMessage());
         }
         
         // Test 3: Extreme ITD values
@@ -414,12 +414,12 @@ public class ValidationSuite {
             
             if (!Double.isNaN(itd) && !Double.isInfinite(itd)) {
                 passed++;
-                log.println("Extreme ITD values: ✅ PASS");
+                log.println("Extreme ITD values: PASS");
             } else {
-                log.println("Extreme ITD values: ❌ FAIL");
+                log.println("Extreme ITD values: FAIL");
             }
         } catch (Exception e) {
-            log.println("Extreme ITD values: ❌ FAIL - " + e.getMessage());
+            log.println("Extreme ITD values: FAIL - " + e.getMessage());
         }
         
         if (demoMode) {
@@ -431,7 +431,7 @@ public class ValidationSuite {
     
     private static int[] testPerformance(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n⚡ Test 7: Performance");
+            System.out.println("\nTest 7: Performance");
         }
         log.println("\n=== Test 7: Performance ===");
         
@@ -446,7 +446,7 @@ public class ValidationSuite {
         long processingTime = endTime - startTime;
         boolean acceptableSpeed = processingTime < 5000; // Should process 10s audio in <5s
         
-        String status = acceptableSpeed ? "✅ PASS" : "❌ FAIL";
+        String status = acceptableSpeed ? "PASS" : "FAIL";
         log.printf("Performance: 10s audio processed in %dms, ITD=%.1fμs, ILD=%.1fdB %s\n",
             processingTime, itd, ild, status);
         
@@ -459,25 +459,25 @@ public class ValidationSuite {
     
     private static int[] testRealAudioProcessing(PrintWriter log) {
         if (demoMode) {
-            System.out.println("\n🎧 Test 8: Real Audio Processing");
+            System.out.println("\nTest 8: Real Audio Processing");
         }
         log.println("\n=== Test 8: Real Audio Processing ===");
         
         // Check if we have input files
         File inputDir = new File("input_wavs");
         if (!inputDir.exists()) {
-            log.println("⚠️  No input_wavs directory found");
+            log.println("No input_wavs directory found");
             if (demoMode) {
-                System.out.println("  ⚠️  No audio files found - skipping");
+                System.out.println("  No audio files found - skipping");
             }
             return new int[]{0, 1}; // Skip this test
         }
         
         File[] wavFiles = inputDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".wav"));
         if (wavFiles == null || wavFiles.length == 0) {
-            log.println("⚠️  No WAV files found");
+            log.println("No WAV files found");
             if (demoMode) {
-                System.out.println("  ⚠️  No WAV files found - skipping");
+                System.out.println("  No WAV files found - skipping");
             }
             return new int[]{0, 1}; // Skip this test
         }
@@ -508,13 +508,13 @@ public class ValidationSuite {
                 
                 if (validITD && validILD && validShift) {
                     successfulFiles++;
-                    log.printf("✅ %s: ITD=%.1fμs, ILD=%.1fdB\n", wavFile.getName(), itd, ild);
+                    log.printf("PASS %s: ITD=%.1fμs, ILD=%.1fdB\n", wavFile.getName(), itd, ild);
                 } else {
-                    log.printf("❌ %s: Processing failed\n", wavFile.getName());
+                    log.printf("FAIL %s: Processing failed\n", wavFile.getName());
                 }
                 
             } catch (Exception e) {
-                log.printf("❌ %s: Error - %s\n", wavFile.getName(), e.getMessage());
+                log.printf("FAIL %s: Error - %s\n", wavFile.getName(), e.getMessage());
             }
         }
         

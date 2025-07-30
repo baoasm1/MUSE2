@@ -218,11 +218,11 @@ public class LiveScarlettDemo {
                 
                 // Interpret results
                 if (itdChange < 10) {
-                    System.out.println("  ✓ Spatial location preserved (ITD change < 10μs)");
+                    System.out.println("  Spatial location preserved (ITD change < 10μs)");
                 } else if (itdChange < 20) {
-                    System.out.println("  ⚠ Spatial location slightly affected (ITD change 10-20μs)");
+                    System.out.println("  Spatial location slightly affected (ITD change 10-20μs)");
                 } else {
-                    System.out.println("  ✗ Spatial location significantly degraded (ITD change > 20μs)");
+                    System.out.println("  Spatial location significantly degraded (ITD change > 20μs)");
                 }
             }
             
@@ -237,11 +237,11 @@ public class LiveScarlettDemo {
             
             float[][] audio;
             if (filename.contains("speech")) {
-                audio = muse2.SyntheticSignalGenerator.generateSpeechLikeSignal(3.0, SAMPLE_RATE, 250.0, 3.0);
+                audio = muse2.SyntheticSignalGenerator.generateSpeechLikeSignal(3.0f, SAMPLE_RATE, 250.0f, 3.0f);
             } else if (filename.contains("music")) {
-                audio = muse2.SyntheticSignalGenerator.generateSineStereo(3.0, SAMPLE_RATE, 1000.0, 100.0, 2.0);
+                audio = muse2.SyntheticSignalGenerator.generateSineStereo(3.0f, SAMPLE_RATE, 1000.0f, 100.0f, 2.0f);
             } else {
-                audio = muse2.SyntheticSignalGenerator.generateNoisySignal(3.0, SAMPLE_RATE, 800.0, 150.0, 1.5, 0.1);
+                audio = muse2.SyntheticSignalGenerator.generateNoisySignal(3.0f, SAMPLE_RATE, 800.0f, 150.0f, 1.5f, 0.1f);
             }
             
             // Save to WAV file

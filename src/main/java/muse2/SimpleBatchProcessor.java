@@ -80,12 +80,10 @@ public class SimpleBatchProcessor {
                             originalITD,
                             originalILD,
                             shiftedITD,
-                            shiftedILD,
-                            itdChange,
-                            ildChange
+                            shiftedILD
                         );
                         
-                        System.out.printf("  Shift %.0fHz: ITD %.1f→%.1fμs (%.1f), ILD %.1f→%.1fdB (%.1f)%n",
+                        System.out.printf("  Shift %.0fHz: ITD %.1f->%.1fμs (%.1f), ILD %.1f->%.1fdB (%.1f)%n",
                             shiftAmount, originalITD, shiftedITD, itdChange, originalILD, shiftedILD, ildChange);
                         
                     } catch (Exception e) {
